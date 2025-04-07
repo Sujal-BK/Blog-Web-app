@@ -154,7 +154,11 @@ export const deleteBlogById = async (req, res) => {
 
         }
 
-        await Comment.deleteMany({id})
+        await User.findByIdAndUpdate(req.currentUser._id,{
+            $pull :{blogsId:deleteBlog._id}
+        })
+
+       
 
         return res.status(200).json({
             success: true,
