@@ -83,6 +83,11 @@ export const getBlogById = async (req, res) => {
 
         }
 
+        return res.status(200).json({
+            success : true,
+            message :'Blog is here',
+            getBlog
+        })
       
     } catch (error) {
         console.log(error);

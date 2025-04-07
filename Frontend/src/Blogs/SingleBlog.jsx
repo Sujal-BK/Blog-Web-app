@@ -9,9 +9,13 @@ const SingleBlog = () => {
     
     const getBlogById = async() =>{
       try {
+        
+        
         const {data} = await api(`/blog/get-blog/${id}`)
+       console.log(data);
+       
         setBlog(data.getBlog)
-        console.log(data.getBlog);
+       
         
       } catch (error) {
         console.log(error);
