@@ -29,7 +29,7 @@ const Login = () => {
             })
            
             
-            storeTokenInLS(data.token,role)
+            storeTokenInLS(data.token,data.role)
             toast.success("Login Successfully")
             navigate("/blog")
         } catch (error) {
@@ -87,7 +87,7 @@ const Login = () => {
                                 onChange={(e) => setRole(e.target.value)}
                                 className='border border-blue-400 rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-500'
                             >
-                                <option value="user">User </option>
+                                <option value="user">user </option>
                                 <option value="admin">admin</option>
                             </select>
                         </div>

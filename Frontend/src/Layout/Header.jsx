@@ -22,7 +22,7 @@ const Header = () => {
                 <div className='hidden md:flex items-center text-lg gap-10 mx-28'>
                     <Link  to='/'  className='hover:bg-blue-500 p-2 rounded-md hover:scale-105 duration-100 hover:text-white'><div>Home</div></Link>
                     <Link  to='/blog' className='hover:bg-blue-500 p-2 rounded-md hover:scale-105 duration-100 hover:text-white'><div>Blogs</div></Link>
-                    <Link  to='privacy-policy'  className='hover:bg-blue-500 p-2 rounded-md hover:scale-105 duration-100 hover:text-white'><div>Privacy Policy</div></Link>
+                    <Link  to='/privacy-policy'  className='hover:bg-blue-500 p-2 rounded-md hover:scale-105 duration-100 hover:text-white'><div>Privacy Policy</div></Link>
                     {!isLoggedIn ? (<Link to='/register' className='flex items-center gap-2 hover:bg-blue-500 p-2 rounded-md hover:scale-105 duration-100 hover:text-white'><div className='text-xl'><FaRegUser  /></div><div>Register</div></Link>):(<Link to='/logout' className='flex items-center gap-2 hover:bg-blue-500 p-2 rounded-md hover:scale-105 duration-100 hover:text-white'><div>Logout</div></Link>)}
                 </div>
                 <div className='md:hidden'>

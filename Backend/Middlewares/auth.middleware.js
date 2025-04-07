@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 
 export const generateToken = (userData) => {
     const payload = {
+        _id: userData._id,
         email: userData.email,
         role: userData.role 
 
@@ -18,6 +19,7 @@ export const jsonAuthMiddleware = async (req, res, next) => {
        
         const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY)
         req.currentUser = {
+            _id: verifyToken._id,
             email: verifyToken.email,
             role: verifyToken.role 
         };
@@ -35,6 +37,9 @@ export const jsonAuthMiddleware = async (req, res, next) => {
 
 
 export const isAdmin = (req, res, next) => {
+
+    console.log("Role in token:", req.currentUser?.role);
+
    
 
     if (!req.currentUser || req.currentUser.role.trim() !== "admin") {

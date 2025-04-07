@@ -1,4 +1,5 @@
 import Blog from "../Models/blog.model.js";
+import User from "../Models/user.model.js";
 
 // add blog
 export const addBlog = async (req, res) => {
@@ -20,6 +21,10 @@ export const addBlog = async (req, res) => {
             coverImg,
             category,
             author
+        })
+
+        await User.findByIdAndUpdate(req.currentUser._id,{
+            $push : {blogsId:addNewBlog._id}
         })
 
         return res.status(200).json({
@@ -201,3 +206,39 @@ export const serachBlog = async (req, res) => {
         })
     }
 }
+
+
+export const getUserSpecifBlog = async (req, res) => {
+    try {
+      const userId = req.currentUser._id;
+  
+      const user = await User.findById(userId).populate({
+        path: "blogsId",
+        select: "_id title description", 
+      });
+  
+      console.log(user);
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: "Your Blogs fetched successfully!",
+        blogs: user.blogsId,
+      });
+  
+    } catch (error) {
+      console.error("Error in getUserSpecifBlog:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Error while getting user-specific blogs.",
+        error,
+      });
+    }
+  };
+  

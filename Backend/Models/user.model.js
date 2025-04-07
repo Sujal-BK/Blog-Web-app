@@ -19,7 +19,11 @@ const userSchema = new mongoose.Schema({
         type : String,
         default :"user",
         enum:["user","admin"]
-    }
+    },
+    blogsId:[{
+        type : mongoose.Schema.Types.ObjectId,
+        ref :"Blog"
+    }]
 },{
     timestamps : true,
 })

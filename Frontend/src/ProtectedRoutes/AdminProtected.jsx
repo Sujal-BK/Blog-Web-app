@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../Axios/Config";
-import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import {  Outlet, useNavigate } from 'react-router-dom';
 import toast from "react-hot-toast";
 
 const AdminProtected = () => {

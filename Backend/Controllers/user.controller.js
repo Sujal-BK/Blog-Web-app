@@ -69,7 +69,7 @@ export const login = async(req,res)=>{
             })
         }
 
-        const token = generateToken({email:newUser.email,role:newUser.role})
+        const token = generateToken({_id : newUser._id,email:newUser.email,role:newUser.role})
 
         return res.status(200).json({
             success : true,

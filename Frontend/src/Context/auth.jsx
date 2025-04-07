@@ -7,14 +7,16 @@ export const AuthProvider = ({ children }) => {
     const [role, setRole] = useState(localStorage.getItem('role'))
 
     const storeTokenInLS = (serverToken, role) => {
-        setToken(serverToken)
-        setRole(role)
-        localStorage.setItem('token', serverToken)
-        localStorage.setItem('role', role)
-    }
-
+        const cleanRole = role?.trim().toLowerCase();
+        setToken(serverToken);
+        setRole(cleanRole);
+        localStorage.setItem('token', serverToken);
+        localStorage.setItem('role', cleanRole);
+    };
+    
     let isLoggedIn = !!token;
-    let isAdmin = role === 'Admin'
+    let isAdmin = role?.trim().toLowerCase() === 'admin';
+
 
     const Logout = () => {
         setToken("")

@@ -9,47 +9,44 @@ const AddBlog = () => {
   const token = localStorage.getItem('token');
   const [Blogs, setBlogs] = useState([]);
 
-  
-
   const config = {
     headers: {
       Authorization: `${token}`
     }
   };
-  const fetchBlog = async () => {
+
+  const fetchUserBlogs = async () => {
     try {
-      const { data } = await api.get("/blog/get-blogs");
-      setBlogs(data.getBlogs);
-      console.log(data.getBlogs);
+      const { data } = await api.get("/blog/my-blogs", config); 
+      setBlogs(data.blogs); 
+      console.log(data.blogs);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching user-specific blogs:", error);
+      toast.error("Failed to fetch your blogs");
     }
   };
 
   useEffect(() => {
-    fetchBlog();
+    fetchUserBlogs();
   }, []);
 
-  const deleteBlog = async(id) =>{
+  const deleteBlog = async (id) => {
     try {
-       await api.delete(`/blog/delete-blog/${id}`,config)
-       toast.success('Blog Deleted Successfully')
+      await api.delete(`/blog/delete-blog/${id}`, config);
+      toast.success('Blog Deleted Successfully');
+      fetchUserBlogs(); // Refresh list after delete
     } catch (error) {
-      console.log(error);
-      toast.error('Blog Updation Failled')
+      console.error("Delete failed:", error);
+      toast.error('Blog Deletion Failed');
     }
-  }
-
-  
- 
- 
+  };
 
   return (
     <Layout>
       <div className="container mx-auto p-4 font-[Poppins]">
-        <h1 className="text-2xl font-bold mb-4">Blogs</h1>
+        <h1 className="text-2xl font-bold mb-4">Your Blogs</h1>
         <div className="overflow-x-auto">
-          <SerachBlog/>
+          <SerachBlog />
           <table className="min-w-full bg-white border border-gray-200">
             <thead>
               <tr>
@@ -59,36 +56,44 @@ const AddBlog = () => {
               </tr>
             </thead>
             <tbody>
-              {Blogs.map((blog, index) => (
-                <tr key={blog._id} className="hover:bg-gray-100">
-                  <td className="py-2 px-4 border-b text-left">{index + 1}</td>
-                  <td className="py-2 px-4 border-b text-left">{blog.title}</td>
-                  <td className="py-2 px-4 border-b text-left">
-                    <Link
-                      to={`update-blog/${blog._id}`} // Link to the update page
-                      className="bg-blue-500 text-white px-4 py-2 rounded mr-2 inline-block hover:scale-105 duration-200"
-                    >
-                      Update
-                    </Link>
-                    <button 
-                   
-                      
-                      onClick={() => deleteBlog(blog._id)} // Handle delete on click
-                      className="bg-red-500 text-white px-4 py-2 rounded inline-block hover:scale-105 duration-200"
-                    >
-                      Delete
-                    </button>
+              {Blogs.length > 0 ? (
+                Blogs.map((blog, index) => (
+                  <tr key={blog._id} className="hover:bg-gray-100">
+                    <td className="py-2 px-4 border-b text-left">{index + 1}</td>
+                    <td className="py-2 px-4 border-b text-left">{blog.title}</td>
+                    <td className="py-2 px-4 border-b text-left">
+                      <Link
+                        to={`update-blog/${blog._id}`}
+                        className="bg-blue-500 text-white px-4 py-2 rounded mr-2 inline-block hover:scale-105 duration-200"
+                      >
+                        Update
+                      </Link>
+                      <button
+                        onClick={() => deleteBlog(blog._id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded inline-block hover:scale-105 duration-200"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center py-4 text-gray-500">
+                    No blogs found.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
-
-         
         </div>
-        <Link to="create-blog" 
-          className='bg-blue-500 my-4 rounded text-white p-2 hover:scale-105 duration-150'
-          >Add Blog</Link>
+
+        <Link
+          to="create-blog"
+          className="bg-blue-500 mt-4 inline-block rounded text-white p-2 hover:scale-105 duration-150"
+        >
+          Add Blog
+        </Link>
       </div>
     </Layout>
   );
