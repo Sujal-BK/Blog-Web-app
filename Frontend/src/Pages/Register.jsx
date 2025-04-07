@@ -2,44 +2,40 @@ import React, { useState } from 'react';
 import Layout from '../Layout/Layout';
 import { FaRegUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../Axios/Config';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [role, setRole] = useState("user"); 
 
-    const [username, setUsername] = useState("")
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-
-
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handlePassword = () => {
         setShowPassword(!showPassword);
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
             const { data } = await api.post(`/auth/register`, {
                 username,
                 email,
-                password
-            })
+                password,
+                role 
+            });
 
-            toast.success("Registration Successfully")
-            navigate("/login")
-
-
+            toast.success("Registration Successfully");
+            navigate("/login");
         } catch (error) {
             console.log(error);
-            toast.error("Registration Failed")
+            toast.error("Registration Failed");
         }
-    }
+    };
 
     return (
         <Layout>
@@ -96,6 +92,18 @@ const Register = () => {
                                 />
                             </div>
                         </div>
+
+                        <div>
+                            <label className='block text-sm font-medium text-gray-700'>Select Role</label>
+                            <select
+                                value={role}
+                                onChange={(e) => setRole(e.target.value)}
+                                className='border border-blue-400 rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-500'
+                            >
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className='mt-4'>
@@ -109,6 +117,6 @@ const Register = () => {
             </div>
         </Layout>
     );
-}
+};
 
 export default Register;

@@ -3,8 +3,8 @@ import bcrypt from 'bcryptjs'
 import { generateToken } from "../Middlewares/auth.middleware.js";
 export const register = async(req,res)=>{
     try {
-        const {username,email,password} = req.body
-        if(!username || !email || !password){
+        const {username,email,password,role} = req.body
+        if(!username || !email || !password ||!role){
             return res.status(404).json({
                 success : false,
                 message : "All Fields Are Mandatory..."
@@ -23,7 +23,8 @@ export const register = async(req,res)=>{
         const newUser = await User.create({
             username,
             password : hash_password,
-            email
+            email,
+            role
         })
 
         
@@ -46,8 +47,8 @@ export const register = async(req,res)=>{
 
 export const login = async(req,res)=>{
     try {
-        const {email,password,role} = req.body
-        if(!email || !password || !role){
+        const {email,password} = req.body
+        if(!email || !password ){
             return res.status(404).json({
                 success : false,
                 message : "All Fields Are Mandatory..."
@@ -75,7 +76,7 @@ export const login = async(req,res)=>{
             success : true,
             message : "User Login Successfully...",
             token,
-            role
+            role :newUser.role
         })
     } catch (error) {
         console.log(error);

@@ -8,7 +8,7 @@ import api from '../Axios/Config';
 import { useAuth } from '../Context/auth';
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
-    const [role, setRole] = useState('user'); // Default role
+   
     const [email,setEmail]  =useState("")
     const [password,setPassword] = useState("")
 
@@ -25,9 +25,17 @@ const Login = () => {
             const {data} =  await api.post(`/auth/login`,{
                 email,
                 password,
-                role
+                
             })
+
+
+            console.log(data);
+            
+
+            
            
+           
+            
             
             storeTokenInLS(data.token,data.role)
             toast.success("Login Successfully")
@@ -80,17 +88,7 @@ const Login = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <label className='block text-sm font-medium text-gray-700'>Role</label>
-                            <select
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                className='border border-blue-400 rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-500'
-                            >
-                                <option value="user">user </option>
-                                <option value="admin">admin</option>
-                            </select>
-                        </div>
+                        
                     </div>
 
                     <div className='mt-4'>
