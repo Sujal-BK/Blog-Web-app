@@ -176,41 +176,37 @@ export const deleteBlogById = async (req, res) => {
 
 
 // search blog
-export const serachBlog = async (req, res) => {
+export const searchBlog = async (req, res) => {
     try {
         const { title } = req.query;
-        if (!title) {
+
+        if (!title || title.trim() === "") {
             return res.status(400).json({
                 success: false,
                 message: "Title query parameter is required.",
             });
         }
 
-        const regex = new RegExp(title, 'i')
-        const matchingBlogs = await Blog.find({ title: regex })
+        // Escape special RegExp characters in the input
+        const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escapedTitle, 'i');
 
-        if (matchingBlogs.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "No blogs found with the given title.",
-            });
-        }
+        const blogs = await Blog.find({ title: regex });
 
         return res.status(200).json({
             success: true,
-            message: "Matching blogs found.",
-            matchingBlogs,
+            message: blogs.length ? "Matching blogs found." : "No blogs found.",
+            blogs,
         });
+
     } catch (error) {
-        console.log(error);
+        console.error("Search Blog Error:", error);
         return res.status(500).json({
             success: false,
-            message: "Error in searching Blog...",
-            error
-        })
+            message: "Server error while searching blogs.",
+        });
     }
-}
-
+};
 
 export const getUserSpecifBlog = async (req, res) => {
     try {

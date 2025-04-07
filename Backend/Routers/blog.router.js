@@ -1,5 +1,5 @@
 import express from 'express'
-import { addBlog, deleteBlogById, getBlog, getBlogById, getUserSpecifBlog, serachBlog, updateBlogById } from '../Controllers/blog.controller.js'
+import { addBlog, deleteBlogById, getBlog, getBlogById, getUserSpecifBlog, searchBlog, updateBlogById } from '../Controllers/blog.controller.js'
 import { isAdmin, jsonAuthMiddleware } from '../Middlewares/auth.middleware.js'
 
 
@@ -27,7 +27,7 @@ router.delete("/delete-blog/:id",jsonAuthMiddleware,isAdmin,deleteBlogById)
 
 
 //search blog
-router.get("/search",serachBlog)
+router.get("/search",searchBlog)
 
 
 router.get("/my-blogs", jsonAuthMiddleware, isAdmin, getUserSpecifBlog);
