@@ -4,9 +4,12 @@ import User from '../Models/user.model.js'
 export const generateToken = (userData) => {
     const payload = {
         email: userData.email,
+        role: userData.role 
 
     }
-    return jwt.sign(payload, process.env.JWT_SECRET_KEY)
+    return jwt.sign(payload, process.env.JWT_SECRET_KEY,{
+        expiresIn : "1d"
+    })
 }
 
 
@@ -15,11 +18,14 @@ export const jsonAuthMiddleware = async (req, res, next) => {
         const token = req.headers.authorization;
         console.log('Token : ', token);
         const verifyToken = jwt.verify(token, process.env.JWT_SECRET_KEY)
-        req.currentUser = { email: verifyToken.email }
+        req.currentUser = {
+            email: verifyToken.email,
+            role: verifyToken.role 
+        };
         next()
 
     } catch (error) {
-        console.log(error);
+        console.log('Error :' ,error);
         return res.status(401).json({
             success: false,
             message: "Invalid token or Unauthorized access..."
@@ -29,35 +35,16 @@ export const jsonAuthMiddleware = async (req, res, next) => {
 }
 
 
-export const isAdmin = async (req, res, next) => {
-    console.log("this is user info : ",req.currentUser);
-    
-    if (!req.currentUser) {
-        return res.status(401).json({
-          success: false,
-          message: "Unauthorized User..."
-        });
-      }
-    try {
-        const ifUserAdmin = await User.findOne({ email: req.currentUser.email })
-        if (!ifUserAdmin) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized User..."
-            })
-        }
-        if (ifUserAdmin.role !== "admin") {
-            return res.status(400).json({
-                success: false,
-                message: "Unauthorized User..."
-            });
-        }
-       next();
-    } catch (error) {
-        return res.status(500).json({
+export const isAdmin = (req, res, next) => {
+    console.log("User Info from Token:", req.currentUser);
+
+    if (!req.currentUser || req.currentUser.role.trim() !== "admin") {
+        return res.status(403).json({
             success: false,
-            message: "Error in Admin Role...",
-            error
-        })
+            message: "Access denied: Admins only."
+        });
     }
+
+    next();
 }
+

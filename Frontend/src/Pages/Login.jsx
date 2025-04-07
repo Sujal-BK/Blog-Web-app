@@ -88,7 +88,7 @@ const Login = () => {
                                 className='border border-blue-400 rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-500'
                             >
                                 <option value="user">User </option>
-                                <option value="admin">Admin</option>
+                                <option value="admin">admin</option>
                             </select>
                         </div>
                     </div>

@@ -47,7 +47,7 @@ export const register = async(req,res)=>{
 export const login = async(req,res)=>{
     try {
         const {email,password,role} = req.body
-        if(!email || !password){
+        if(!email || !password || !role){
             return res.status(404).json({
                 success : false,
                 message : "All Fields Are Mandatory..."
@@ -69,7 +69,7 @@ export const login = async(req,res)=>{
             })
         }
 
-        const token = generateToken({email:newUser.email})
+        const token = generateToken({email:newUser.email,role:newUser.role})
 
         return res.status(200).json({
             success : true,

@@ -23,6 +23,11 @@ const Details = () => {
 
   const addBlogs = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
+
+    if (!token) {
+      toast.error("You must be signed in to add a blog.");
+      return navigate('/login');
+    }
     try {
       const { data } = await api.post('/blog/add-blog', {
         author,
@@ -44,7 +49,12 @@ const Details = () => {
       navigate('/add-blog')
     } catch (error) {
       console.log(error);
-      toast.error('Error in Blog adding');
+      if (error.response && error.response.status === 401) {
+        toast.error("You must be signed in to add a blog.");
+        navigate('/login'); // optional redirect to login
+      } else {
+        toast.error('Error in adding blog');
+      }
     }
   };
 
