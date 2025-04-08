@@ -1,5 +1,5 @@
 import express from 'express'
-import { deleteUser, getUser, login, register } from '../Controllers/user.controller.js';
+import { deleteUser, forgotPassword, getUser, login, register, verifyAndChangePassword } from '../Controllers/user.controller.js';
 import { isAdmin, jsonAuthMiddleware } from '../Middlewares/auth.middleware.js';
 
 const router = express.Router()
@@ -30,6 +30,13 @@ router.get("/admin",jsonAuthMiddleware,isAdmin,(req,res)=>{
 router.get("/user",jsonAuthMiddleware,(req,res)=>{
     res.status(200).send({ok:true})
 })
+
+//forgot password
+router.post("/forgot-password",forgotPassword)
+
+
+//verify otp and change password
+router.post("/verify-otp",verifyAndChangePassword)
 
 
 export default router;
