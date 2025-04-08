@@ -4,7 +4,7 @@ import api from '../Axios/Config';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 const Details = () => {
-  const [coverImg, setCoverImg] = useState("");
+  const [coverImg, setCoverImg] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [author, setAuthor] = useState("");
@@ -17,7 +17,8 @@ const Details = () => {
 
   const config = {
     headers: {
-      Authorization: `${token}`
+      Authorization: `${token}`,
+     
     }
   };
 
@@ -28,30 +29,31 @@ const Details = () => {
       toast.error("You must be signed in to add a blog.");
       return navigate('/login');
     }
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('category', category);
+    formData.append('description', description);
+    formData.append('content', content);
+    formData.append('coverImg', coverImg); 
+
     try {
-      const { data } = await api.post('/blog/add-blog', {
-        author,
-        coverImg,
-        content,
-        category,
-        description,
-        title
-      }, config);
-      console.log(data);
-      // Clear the form fields
+      const { data } = await api.post('/blog/add-blog', formData, config);
+      toast.success('Blog Added Successfully');
+
+      
       setAuthor("");
-      setCoverImg("");
+      setCoverImg(null);
       setContent("");
       setCategory("");
       setDescription("");
       setTitle("");
-      toast.success('Blog Added Successfully');
-      navigate('/add-blog')
+      navigate('/add-blog');
     } catch (error) {
       console.log(error);
-      if (error.response && error.response.status === 401) {
+      if (error.response?.status === 401) {
         toast.error("You must be signed in to add a blog.");
-        navigate('/login'); // optional redirect to login
+        navigate('/login');
       } else {
         toast.error('Error in adding blog');
       }
@@ -107,10 +109,11 @@ const Details = () => {
               Cover Image URL
             </label>
             <input
-              type="text"
+              type="file"
+              accept='image/*'
               id="coverImg"
-              value={coverImg}
-              onChange={(e) => setCoverImg(e.target.value)}
+             
+              onChange={(e) => setCoverImg(e.target.files[0])}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />

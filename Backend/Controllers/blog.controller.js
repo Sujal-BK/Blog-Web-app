@@ -1,12 +1,15 @@
 import Blog from "../Models/blog.model.js";
 import User from "../Models/user.model.js";
+import cloudinary from "../Utils/clodinaryConfig.js";
 
 // add blog
 export const addBlog = async (req, res) => {
     try {
-        const { title, description, content, coverImg, category, author } = req.body;
 
-        if (!title || !description || !content || !coverImg || !category || !author) {
+
+        const { title, description, content, category, author } = req.body;
+
+        if (!title || !description || !content || !category || !author) {
             return res.status(400).json({
                 success: false,
                 message: "All Fields Are Mandatory...",
@@ -14,17 +17,34 @@ export const addBlog = async (req, res) => {
             })
         }
 
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cover image is required!'
+            })
+        }
+
+
+
+
+
+
+
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'blog-covers'
+        })
+
         const addNewBlog = await Blog.create({
             title,
             description,
             content,
-            coverImg,
+            coverImg: result.secure_url,
             category,
             author
         })
 
-        await User.findByIdAndUpdate(req.currentUser._id,{
-            $push : {blogsId:addNewBlog._id}
+        await User.findByIdAndUpdate(req.currentUser._id, {
+            $push: { blogsId: addNewBlog._id }
         })
 
         return res.status(200).json({
@@ -89,11 +109,11 @@ export const getBlogById = async (req, res) => {
         }
 
         return res.status(200).json({
-            success : true,
-            message :'Blog is here',
+            success: true,
+            message: 'Blog is here',
             getBlog
         })
-      
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -112,23 +132,30 @@ export const getBlogById = async (req, res) => {
 export const updateBlogById = async (req, res) => {
     try {
         const { id } = req.params
-        const updateBlog = await Blog.findByIdAndUpdate(id, {
-            ...req.body
-        }, { new: true })
 
-        // if (!updateBlog) {
-        //     return res.status(404).json({
-        //         success: false,
-        //         message: "Blog not found...",
+        const updateData = { ...req.body };
 
-        //     })
 
-        // }
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: "blog-covers",
+            });
+
+            updateData.coverImg = result.secure_url;
+        }
+
+        const updatedBlog = await Blog.findByIdAndUpdate(id, updateData, {
+            new: true,
+        });
+
+
+
+
 
         return res.status(200).json({
             success: true,
             message: "Blog is updated...",
-            updateBlog
+            updatedBlog
         })
     } catch (error) {
         console.log(error);
@@ -154,11 +181,11 @@ export const deleteBlogById = async (req, res) => {
 
         }
 
-        await User.findByIdAndUpdate(req.currentUser._id,{
-            $pull :{blogsId:deleteBlog._id}
+        await User.findByIdAndUpdate(req.currentUser._id, {
+            $pull: { blogsId: deleteBlog._id }
         })
 
-       
+
 
         return res.status(200).json({
             success: true,
@@ -210,35 +237,34 @@ export const searchBlog = async (req, res) => {
 
 export const getUserSpecifBlog = async (req, res) => {
     try {
-      const userId = req.currentUser._id;
-  
-      const user = await User.findById(userId).populate({
-        path: "blogsId",
-        select: "_id title description", 
-      });
-  
-      console.log(user);
-      
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
+        const userId = req.currentUser._id;
+
+        const user = await User.findById(userId).populate({
+            path: "blogsId",
+            select: "_id title description",
         });
-      }
-  
-      return res.status(200).json({
-        success: true,
-        message: "Your Blogs fetched successfully!",
-        blogs: user.blogsId,
-      });
-  
+
+        console.log(user);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Your Blogs fetched successfully!",
+            blogs: user.blogsId,
+        });
+
     } catch (error) {
-      console.error("Error in getUserSpecifBlog:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Error while getting user-specific blogs.",
-        error,
-      });
+        console.error("Error in getUserSpecifBlog:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error while getting user-specific blogs.",
+            error,
+        });
     }
-  };
-  
+};
