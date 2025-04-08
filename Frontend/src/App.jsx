@@ -10,6 +10,7 @@ import AddBlog from "./Blogs/AddBlog"
 import UpdateBlog from "./Blogs/UpdateBlog"
 import Details from "./Blogs/Details"
 import PrivacyPolicy from "./Pages/PrivacyPolicy"
+import ForgotPassword from "./Pages/ForgotPassword"
 function App() {
 
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="create-blog" element={<Details/>}/>
         </Route>
         <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
+        <Route path="/forgot-password" element={<ForgotPassword/>}/>
         
 
       </Routes>

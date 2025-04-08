@@ -1,6 +1,14 @@
 import User from "../Models/user.model.js";
 import bcrypt from 'bcryptjs'
 import { generateToken } from "../Middlewares/auth.middleware.js";
+import transporter from "../Utils/nodeMailerConfig.js";
+import crypto from 'crypto'
+import dotenv from 'dotenv'
+dotenv.config()
+
+const otpStore = {}
+
+
 export const register = async(req,res)=>{
     try {
         const {username,email,password,role} = req.body
@@ -132,5 +140,88 @@ export const deleteUser = async(req,res)=>{
             message : "Error in Delete User...",
             error
         })
+    }
+}
+
+
+
+export const forgotPassword = async (req, res) => {
+    try {
+      const { email } = req.body;
+      console.log("Incoming email:", email);
+  
+      const user = await User.findOne({ email }); // ✅ Make sure `User` is imported!
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "This email doesn't exist",
+        });
+      }
+  
+      const otp = crypto.randomInt(100000, 999999).toString();
+      otpStore[email] = otp;
+  
+      await transporter.sendMail({
+        from: process.env.USER,
+        to: email, 
+        subject: 'One Time Password',
+        text: `Your OTP is: ${otp}`,
+      
+    });
+  
+      return res.status(200).json({
+        success: true,
+        message: "OTP sent to your email",
+      });
+    } catch (error) {
+      console.error("🔥 Forgot Password Controller Error:", error); // 👈 check your terminal!
+      return res.status(500).json({
+        success: false,
+        message: "Error in forgot password...",
+        error: error.message, // make it readable
+      });
+    }
+  };
+  
+
+export const verifyAndChangePassword = async(req,res)=>{
+    try {
+        const {email,otp,newPassword} = req.body
+        if(email==""){
+            return res.status(400).json({
+                success: false,
+                message: 'Please Enter Email'
+            })
+        } 
+        if(otpStore[email]!==otp){
+            return res.status(400).json({
+                success: false,
+                message: "Invalid OTP"
+            });
+        }
+        const user = await User.findOne({email})
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User  doesn't exist"
+            });
+        }
+        const hash_password = await bcrypt.hash(newPassword,10)
+        user.password = hash_password
+        await user.save();
+
+        delete otpStore[email];
+
+        return res.status(200).json({
+            success: true,
+            message: "Password changed successfully",
+            hash_password
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
     }
 }
